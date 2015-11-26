@@ -1,1 +1,1 @@
-R CMD BATCH --no-save --no-restore analyse.r
+R CMD BATCH --no-save --no-restore analyze.r
