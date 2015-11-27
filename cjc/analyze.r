@@ -1,8 +1,9 @@
 print("Fetching Records")
 
+### Read the data into a table
 data = read.csv(url("http://www.data.act.gov.au/api/views/rux9-a9a9/rows.csv?accessType=DOWNLOAD"))
 
-print(c("Collected Records",nrow(data)))
+print(c("Collected Records", nrow(data)))
 
 print("Records Columns")
 print(colnames(data))
@@ -17,37 +18,48 @@ print("Country Values")
 print(unique(data$Country))
 
 
+### Convert raw date data into the Date data type
 #print(data$Start.Date) #check at raw start date format
 data$Start.Date = as.Date(data$Start.Date, "%d/%m/%Y")
 #print(data$Start.Date) #check at corrected start date format
 
+### Remove records that did not have parse-able dates
 #filter records with no start date
 data = subset(data, !is.na(data$Start.Date))
-print(c("Records with valid dates",nrow(data)))
+print(c("Records with valid dates", nrow(data)))
 
 
+### Compute the quantiles of the date data
 start_date_range = quantile(data$Start.Date, c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0), type = 1)
+print("Date Distribution")
 print(start_date_range)
-print(nrow(data))
+#print(nrow(data))
 
+### Remove outliers.  i.e. those below 10% and above 90% quantiles
 data = data[data$Start.Date >= start_date_range[2] & data$Start.Date <= start_date_range[6], ]
-print(c("Records after removing date outliers",nrow(data)))
+print(c("Records after removing date outliers", nrow(data)))
 
+### Build functions for extracting the year and month from a date value
 date_year = function(date){as.numeric(format(date, "%Y"))}
 date_month = function(date){as.numeric(format(date, "%m"))}
 
-print(c("Date span",format(min(data$Start.Date)), format(max(data$Start.Date))))
+print(c("Date span", format(min(data$Start.Date)), format(max(data$Start.Date))))
 
+### Compute the number of years and months that the dataset spans
 year_span = date_year(max(data$Start.Date)) - date_year(min(data$Start.Date))
 month_span = (12-date_month(min(data$Start.Date))) + date_month(max(data$Start.Date)) + 12 * (year_span-2)
-print(c("Date years and months",year_span,month_span))
+print(c("Date years and months", year_span, month_span))
 
 
+### Open a PDF file for writing
 pdf("date_year_hist.pdf", pointsize=14, width=8, height=6)
     
+    ### Render a histogram of the start dates
     hist(data$Start.Date, breaks=year_span, freq=TRUE, main="Vehicles Registered per Year in ACT", xlab="Year")
-    
+
+### Close the PDF for writing    
 dev.off()
+
 
 pdf("date_month_hist.pdf", pointsize=14, width=8, height=6)
     
@@ -56,12 +68,15 @@ pdf("date_month_hist.pdf", pointsize=14, width=8, height=6)
 dev.off()
 
 
+### Build a function for computing a mean with a sliding window
 moving_mean = function(x,window=12){filter(x,rep(1/window,window), sides=2)}
 
 data_startdate_count = aggregate(data, by=list(format(data$Start.Date,"%Y/%m")), FUN=length)
 #print(data_startdate_count)
 #print(moving_mean(data_startdate_count$Type))
 
+
+### Render a PDF of Normalized ACT Vehicle Registrations over time
 pdf("reg_cycle.pdf", pointsize=14, width=8, height=6)
     #data_startdate_count$Group.1
     date_count = data_startdate_count$Type
@@ -81,7 +96,10 @@ pdf("reg_cycle.pdf", pointsize=14, width=8, height=6)
 dev.off()
 
 
+### Count the number of records by "Type"
 data_type_count = aggregate(data, by=list(data$Type), FUN=length)
+
+### Sort the records by "Type"
 data_type_count = data_type_count[order(data_type_count$Type, decreasing=TRUE),]
 #print(data_type_count)
 
@@ -96,6 +114,7 @@ dev.off()
 
 
 
+### Filter records by three specific types
 data_special = subset(data, data$Type == "Motor Cycles" | data$Type == "Trucks" | data$Type == "Trailers")
 print(c("Special Records",nrow(data_special)))
 
