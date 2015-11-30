@@ -1,4 +1,4 @@
-dt = read.csv(url("https://www.data.act.gov.au/api/views/pj6q-ytqp/rows.csv?accessType=DOWNLOAD"))
+dt = read.csv(url("http://www.data.act.gov.au/api/views/pj6q-ytqp/rows.csv?accessType=DOWNLOAD"))
 
 dt$Project.Name <- NULL
 dt$Tender.Schedule.Month <- NULL
