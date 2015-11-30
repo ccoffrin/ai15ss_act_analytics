@@ -4,7 +4,7 @@ library(ggmap)
 #air <- read.csv("Air_Quality_Monitoring_Data.csv", header=T)
 # air <- read.csv(url("https://www.data.act.gov.au/api/views/94a5-zqnn/rows.csv?accessType=DOWNLOAD"), header=T)
 #crashes <- read.csv("Cyclist_Crashes.csv", header=T)
-crashes <- read.csv(url("https://www.data.act.gov.au/api/views/n2kg-qkwj/rows.csv?accessType=DOWNLOAD"), header=T)
+crashes <- read.csv(url("http://www.data.act.gov.au/api/views/n2kg-qkwj/rows.csv?accessType=DOWNLOAD"), header=T)
 
 Canberra <- c(lon = 149.101738, lat = -35.261414)
 
